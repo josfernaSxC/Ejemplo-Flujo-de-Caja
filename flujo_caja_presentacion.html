@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flujo de Caja Proyectado — Mi Barrio Financiero</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #0a0f2e;
+    color: #fff;
+    font-family: 'Calibri', 'Segoe UI', Arial, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 28px 32px 24px;
+  }
+
+  header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 22px;
+  }
+
+  .logo-area {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .logo-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: #1B40E8;
+  }
+
+  .logo-text {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: #7a9fff;
+    text-transform: uppercase;
+  }
+
+  .slide-title {
+    font-size: 26px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.02em;
+  }
+
+  .slide-title span {
+    color: #1B40E8;
+  }
+
+  .main-grid {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 20px;
+    align-items: start;
+  }
+
+  /* TABLA */
+  .table-panel {
+    background: rgba(255,255,255,0.04);
+    border: 0.5px solid rgba(255,255,255,0.1);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  .table-section-header {
+    background: rgba(27,64,232,0.18);
+    padding: 7px 16px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #7a9fff;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  thead th {
+    font-size: 11px;
+    font-weight: 600;
+    color: #7a9fff;
+    text-align: center;
+    padding: 8px 6px 6px;
+    border-bottom: 0.5px solid rgba(255,255,255,0.08);
+    letter-spacing: 0.04em;
+  }
+
+  thead th:first-child { text-align: left; padding-left: 16px; }
+
+  tbody td {
+    padding: 6px 6px;
+    font-size: 13px;
+    border-bottom: 0.5px solid rgba(255,255,255,0.05);
+    text-align: center;
+    color: rgba(255,255,255,0.75);
+  }
+
+  tbody td:first-child {
+    text-align: left;
+    padding-left: 16px;
+    color: rgba(255,255,255,0.55);
+    font-size: 12px;
+  }
+
+  input[type=number] {
+    width: 78px;
+    text-align: center;
+    padding: 4px 4px;
+    font-size: 12px;
+    background: rgba(255,255,255,0.07);
+    border: 0.5px solid rgba(255,255,255,0.15);
+    border-radius: 6px;
+    color: #fff;
+    font-family: inherit;
+    transition: border-color 0.2s;
+  }
+
+  input[type=number]:focus {
+    outline: none;
+    border-color: #1B40E8;
+    background: rgba(27,64,232,0.15);
+  }
+
+  .row-subtotal td {
+    font-weight: 700;
+    font-size: 13px;
+    background: rgba(255,255,255,0.06);
+    color: #fff;
+    border-top: 0.5px solid rgba(255,255,255,0.12);
+  }
+
+  .row-subtotal td:first-child { color: #fff; }
+
+  .row-flujo td {
+    font-weight: 700;
+    font-size: 14px;
+    background: rgba(27,64,232,0.12);
+    border-top: 1px solid rgba(27,64,232,0.5);
+    padding: 9px 6px;
+  }
+
+  .row-acum td {
+    font-size: 12px;
+    color: rgba(255,255,255,0.55);
+    border-bottom: none;
+    padding-bottom: 10px;
+  }
+
+  .pos { color: #1AC780; }
+  .neg { color: #E8197A; }
+
+  /* PANEL DERECHO */
+  .side-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .chart-card {
+    background: rgba(255,255,255,0.04);
+    border: 0.5px solid rgba(255,255,255,0.1);
+    border-radius: 14px;
+    padding: 16px;
+  }
+
+  .card-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #7a9fff;
+    margin-bottom: 12px;
+  }
+
+  .bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    height: 80px;
+    margin-bottom: 6px;
+  }
+
+  .bar-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+  }
+
+  .bar-val {
+    font-size: 9px;
+    font-weight: 700;
+  }
+
+  .bar {
+    width: 100%;
+    border-radius: 4px 4px 0 0;
+    min-height: 4px;
+    transition: height 0.35s ease;
+  }
+
+  .bar-month {
+    font-size: 9px;
+    color: rgba(255,255,255,0.4);
+  }
+
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .metric-card {
+    background: rgba(255,255,255,0.04);
+    border: 0.5px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 12px 14px;
+  }
+
+  .metric-label {
+    font-size: 10px;
+    color: rgba(255,255,255,0.45);
+    margin-bottom: 4px;
+    letter-spacing: 0.04em;
+  }
+
+  .metric-val {
+    font-size: 17px;
+    font-weight: 700;
+  }
+
+  .tip-card {
+    background: rgba(27,64,232,0.12);
+    border: 0.5px solid rgba(27,64,232,0.4);
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-size: 12px;
+    line-height: 1.6;
+    color: rgba(255,255,255,0.8);
+  }
+
+  .legend-row {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 8px;
+  }
+
+  .leg {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10px;
+    color: rgba(255,255,255,0.5);
+  }
+
+  .leg-dot {
+    width: 8px; height: 8px;
+    border-radius: 2px;
+  }
+
+  footer {
+    width: 100%;
+    margin-top: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .footer-hint {
+    font-size: 11px;
+    color: rgba(255,255,255,0.25);
+  }
+
+  .mbf-tag {
+    font-size: 11px;
+    color: rgba(255,255,255,0.2);
+    letter-spacing: 0.06em;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-area">
+    <div class="logo-dot"></div>
+    <div class="logo-text">Mi Barrio Financiero · FEN Universidad de Chile</div>
+  </div>
+  <div class="slide-title">Flujo de Caja <span>Proyectado</span></div>
+</header>
+
+<div class="main-grid">
+
+  <!-- TABLA -->
+  <div class="table-panel">
+    <div class="table-section-header">↑ Ingresos</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Concepto</th>
+          <th>Mes 1</th><th>Mes 2</th><th>Mes 3</th>
+          <th>Mes 4</th><th>Mes 5</th><th>Mes 6</th>
+        </tr>
+      </thead>
+      <tbody id="tbodyI"></tbody>
+    </table>
+
+    <div class="table-section-header" style="margin-top:2px;">↓ Egresos</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Concepto</th>
+          <th>Mes 1</th><th>Mes 2</th><th>Mes 3</th>
+          <th>Mes 4</th><th>Mes 5</th><th>Mes 6</th>
+        </tr>
+      </thead>
+      <tbody id="tbodyE"></tbody>
+    </table>
+
+    <table>
+      <tbody id="tbodyR"></tbody>
+    </table>
+  </div>
+
+  <!-- PANEL DERECHO -->
+  <div class="side-panel">
+
+    <div class="chart-card">
+      <div class="card-label">Flujo neto por mes</div>
+      <div class="legend-row">
+        <div class="leg"><div class="leg-dot" style="background:#1AC780"></div>Positivo</div>
+        <div class="leg"><div class="leg-dot" style="background:#E8197A"></div>Negativo</div>
+      </div>
+      <div class="bars" id="barChart"></div>
+    </div>
+
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-label">Total ingresos</div>
+        <div class="metric-val pos" id="mTotalI">—</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Total egresos</div>
+        <div class="metric-val neg" id="mTotalE">—</div>
+      </div>
+      <div class="metric-card" style="grid-column:1/-1;">
+        <div class="metric-label">Resultado acumulado (6 meses)</div>
+        <div class="metric-val" id="mAcum">—</div>
+      </div>
+    </div>
+
+    <div class="tip-card" id="tipCard">💡 Modifica los valores para ver el análisis.</div>
+
+  </div>
+</div>
+
+<footer>
+  <div class="footer-hint">✏️ Haz clic en cualquier celda para editar el valor</div>
+  <div class="mbf-tag">mibarriofinanciero.cl</div>
+</footer>
+
+<script>
+const meses = ['M1','M2','M3','M4','M5','M6'];
+
+const defaults = {
+  ingresos: [
+    { n: 'Ventas al contado',          v: [350,380,400,420,390,450] },
+    { n: 'Ventas a crédito cobradas',  v: [50, 60, 70, 80, 90,100] },
+    { n: 'Otros ingresos',             v: [0,  0,  20, 0,  0,  30] },
+  ],
+  egresos: [
+    { n: 'Materiales / mercadería',    v: [120,130,140,150,130,160] },
+    { n: 'Arriendo',                   v: [80, 80, 80, 80, 80, 80 ] },
+    { n: 'Sueldos y honorarios',       v: [100,100,100,100,100,100] },
+    { n: 'Servicios básicos',          v: [15, 15, 15, 15, 15, 15 ] },
+    { n: 'Marketing / publicidad',     v: [10, 10, 20, 10, 10, 20 ] },
+    { n: 'Cuota crédito / préstamo',   v: [25, 25, 25, 25, 25, 25 ] },
+  ]
+};
+
+let data = JSON.parse(JSON.stringify(defaults));
+
+function fmt(n) {
+  const abs = Math.abs(Math.round(n));
+  const s = '$' + abs.toLocaleString('es-CL') + 'k';
+  return n < 0 ? '-' + s : s;
+}
+
+function buildSection(tbodyId, rows, prefix) {
+  const tb = document.getElementById(tbodyId);
+  tb.innerHTML = '';
+  rows.forEach((row, ri) => {
+    const tr = document.createElement('tr');
+    let h = `<td>${row.n}</td>`;
+    meses.forEach((_,mi) => {
+      h += `<td><input type="number" step="5" value="${row.v[mi]}" 
+            onchange="onEdit('${prefix}',${ri},${mi},this.value)"></td>`;
+    });
+    tr.innerHTML = h;
+    tb.appendChild(tr);
+  });
+  const trT = document.createElement('tr');
+  trT.className = 'row-subtotal';
+  trT.id = `sub-${prefix}`;
+  let ht = `<td>Total ${prefix==='i'?'ingresos':'egresos'}</td>`;
+  meses.forEach((_,mi) => { ht += `<td id="sub-${prefix}-${mi}">—</td>`; });
+  trT.innerHTML = ht;
+  tb.appendChild(trT);
+}
+
+function onEdit(prefix, ri, mi, val) {
+  (prefix==='i' ? data.ingresos : data.egresos)[ri].v[mi] = parseFloat(val)||0;
+  calc();
+}
+
+function calc() {
+  const tI = meses.map((_,mi) => data.ingresos.reduce((s,r)=>s+r.v[mi],0));
+  const tE = meses.map((_,mi) => data.egresos.reduce((s,r)=>s+r.v[mi],0));
+  const fl = meses.map((_,mi) => tI[mi]-tE[mi]);
+  let ac=0; const acArr = fl.map(f=>{ac+=f;return ac;});
+
+  meses.forEach((_,mi) => {
+    document.getElementById(`sub-i-${mi}`).textContent = fmt(tI[mi]);
+    document.getElementById(`sub-e-${mi}`).textContent = fmt(tE[mi]);
+  });
+
+  const rb = document.getElementById('tbodyR');
+  rb.innerHTML='';
+
+  const trF = document.createElement('tr'); trF.className='row-flujo';
+  let hf='<td>Flujo neto del mes</td>';
+  fl.forEach(f=>{ hf+=`<td class="${f>=0?'pos':'neg'}">${fmt(f)}</td>`; });
+  trF.innerHTML=hf; rb.appendChild(trF);
+
+  const trA = document.createElement('tr'); trA.className='row-acum';
+  let ha='<td>Flujo acumulado</td>';
+  acArr.forEach(a=>{ ha+=`<td class="${a>=0?'pos':'neg'}">${fmt(a)}</td>`; });
+  trA.innerHTML=ha; rb.appendChild(trA);
+
+  drawBars(fl);
+
+  const sumI = tI.reduce((a,b)=>a+b,0);
+  const sumE = tE.reduce((a,b)=>a+b,0);
+  const ult = acArr[5];
+
+  document.getElementById('mTotalI').textContent = fmt(sumI);
+  document.getElementById('mTotalE').textContent = fmt(sumE);
+  const mAcEl = document.getElementById('mAcum');
+  mAcEl.textContent = fmt(ult);
+  mAcEl.className = 'metric-val ' + (ult>=0?'pos':'neg');
+
+  const negs = fl.filter(f=>f<0).length;
+  const worst = fl.indexOf(Math.min(...fl));
+  let tip='';
+  if(negs===0){
+    tip=`✅ ¡Todos los meses positivos! El negocio genera liquidez constante. Resultado acumulado: <strong>${fmt(ult)}</strong>.`;
+  } else if(negs<=2){
+    tip=`⚠️ ${negs} mes(es) con flujo negativo. El peor es M${worst+1} con ${fmt(fl[worst])}. Evalúa adelantar cobros o diferir gastos en esos períodos.`;
+  } else {
+    tip=`🔴 Flujo negativo en ${negs}/6 meses. Riesgo de liquidez. Prioriza reducir egresos variables y asegurar cobros a tiempo.`;
+  }
+  document.getElementById('tipCard').innerHTML = tip;
+}
+
+function drawBars(fl) {
+  const chart = document.getElementById('barChart');
+  const maxAbs = Math.max(...fl.map(Math.abs),1);
+  chart.innerHTML='';
+  fl.forEach((f,i)=>{
+    const pct = Math.round(Math.abs(f)/maxAbs*72);
+    const col = document.createElement('div');
+    col.className='bar-col';
+    const sign = f>=0?'+':'';
+    col.innerHTML=`
+      <div class="bar-val ${f>=0?'pos':'neg'}">${sign}${Math.round(f)}k</div>
+      <div class="bar" style="height:${pct}px;background:${f>=0?'#1AC780':'#E8197A'};opacity:0.85"></div>
+      <div class="bar-month">${meses[i]}</div>`;
+    chart.appendChild(col);
+  });
+}
+
+buildSection('tbodyI', data.ingresos, 'i');
+buildSection('tbodyE', data.egresos, 'e');
+calc();
+</script>
+</body>
+</html>
